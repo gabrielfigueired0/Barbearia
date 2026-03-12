@@ -1,0 +1,265 @@
+body{
+margin:0;
+font-family:Arial, Helvetica, sans-serif;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+/* fundo */
+
+.fundo{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:url("https://images.unsplash.com/photo-1621605815971-fbc98d665033") center/cover;
+filter:brightness(40%);
+z-index:-1;
+}
+
+/* card */
+
+.card{
+width:360px;
+background:white;
+border-radius:15px;
+overflow:hidden;
+box-shadow:0 10px 40px rgba(0,0,0,0.5);
+text-align:center;
+}
+
+/* topo */
+
+.topo{
+background:linear-gradient(180deg,#000,#333);
+color:white;
+padding:30px;
+}
+
+.logo{
+font-size:40px;
+margin-bottom:10px;
+}
+
+.topo h1{
+margin:0;
+font-size:22px;
+}
+
+.topo p{
+margin-top:5px;
+color:#ccc;
+}
+
+/* conteúdo */
+
+.conteudo{
+padding:30px;
+}
+
+label{
+display:block;
+text-align:left;
+margin-bottom:5px;
+}
+
+input{
+width:100%;
+padding:12px;
+border-radius:8px;
+border:1px solid #ccc;
+margin-bottom:20px;
+font-size:14px;
+}
+
+button{
+width:100%;
+padding:12px;
+border:none;
+background:black;
+color:white;
+font-size:16px;
+border-radius:8px;
+cursor:pointer;
+}
+
+button:hover{
+background:#333;
+}
+
+/* mensagem */
+
+.mensagem{
+margin-top:10px;
+color:red;
+}
+
+/* rodapé */
+
+.rodape{
+padding:15px;
+font-size:13px;
+background:#f5f5f5;
+color:#777;
+}
+.conteudo{
+padding:30px;
+display:flex;
+flex-direction:column;
+align-items:center;
+}
+
+/* formulário */
+
+form{
+width:100%;
+display:flex;
+flex-direction:column;
+align-items:center;
+}
+
+/* campo telefone */
+
+input{
+width:80%;
+padding:12px;
+border-radius:8px;
+border:1px solid #ccc;
+margin-bottom:20px;
+font-size:14px;
+}
+
+/* botão */
+
+button{
+width:80%;
+padding:12px;
+border:none;
+background:black;
+color:white;
+font-size:16px;
+border-radius:8px;
+cursor:pointer;
+}
+
+/* notificações */
+
+.mensagem{
+margin-top:15px;
+padding:12px;
+border-radius:8px;
+font-size:14px;
+text-align:center;
+animation:aparecer 0.4s ease;
+}
+
+.sucesso{
+background:#d4edda;
+color:#155724;
+border:1px solid #c3e6cb;
+}
+
+.erro{
+background:#f8d7da;
+color:#721c24;
+border:1px solid #f5c6cb;
+}
+
+@keyframes aparecer{
+from{
+opacity:0;
+transform:translateY(-10px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+
+
+.painel{
+width:400px;
+background:white;
+padding:40px;
+border-radius:15px;
+box-shadow:0 10px 40px rgba(0,0,0,0.4);
+text-align:center;
+}
+
+select,input{
+width:100%;
+padding:12px;
+margin:10px 0;
+border-radius:8px;
+border:1px solid #ccc;
+}
+
+button{
+margin-top:10px;
+}
+/* agenda */
+
+.agenda-container{
+
+width:400px;
+background:white;
+padding:40px;
+border-radius:15px;
+box-shadow:0 10px 40px rgba(0,0,0,0.4);
+text-align:center;
+
+}
+
+.logo-agenda{
+
+width:120px;
+margin-bottom:10px;
+
+}
+
+.agenda-container h1{
+
+margin:10px 0;
+font-size:26px;
+
+}
+
+.agenda-container h2{
+
+margin-bottom:20px;
+color:#555;
+
+}
+
+select,
+input{
+
+width:100%;
+padding:12px;
+margin:10px 0;
+border-radius:8px;
+border:1px solid #ccc;
+
+}
+
+button{
+
+width:100%;
+padding:12px;
+border:none;
+background:black;
+color:white;
+font-size:16px;
+border-radius:8px;
+cursor:pointer;
+
+}
+
+button:hover{
+
+background:#333;
+
+}
