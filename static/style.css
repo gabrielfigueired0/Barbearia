@@ -37,6 +37,7 @@ text-align:center;
 background:linear-gradient(180deg,#000,#333);
 color:white;
 padding:30px;
+<<<<<<< HEAD
 position: relative;
 }
 
@@ -54,6 +55,13 @@ position: relative;
     width:100%;
     height:100%;
     object-fit:cover;
+=======
+}
+
+.logo{
+font-size:40px;
+margin-bottom:10px;
+>>>>>>> c54583e7e956fe3a1c673efb30d6c5cf6e992d8b
 }
 
 .topo h1{

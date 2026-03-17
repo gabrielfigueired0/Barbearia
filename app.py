@@ -3,7 +3,11 @@ from flask import Flask, render_template, request, redirect, url_for
 app = Flask(__name__)
 
 # telefone administrador
+<<<<<<< HEAD
 ADMIN = "74123456789"
+=======
+ADMIN = "74999999999"
+>>>>>>> c54583e7e956fe3a1c673efb30d6c5cf6e992d8b
 
 # lista de agendamentos
 agendamentos = []
@@ -42,7 +46,11 @@ def login():
             mensagem = "Telefone não cadastrado!"
             tipo = "erro"
 
+<<<<<<< HEAD
     return render_template("index.html", mensagem=mensagem, tipo=tipo)
+=======
+    return render_template("agendamento.html", mensagem=mensagem, tipo=tipo)
+>>>>>>> c54583e7e956fe3a1c673efb30d6c5cf6e992d8b
 
 
 # página de agendamento
