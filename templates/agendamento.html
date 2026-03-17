@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+
+<meta charset="UTF-8">
+<title>Agenda - Barbearia Viola</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="agenda-container">
+
+<img src="{{ url_for('static', filename='logo.png') }}" class="logo-agenda">
+
+</div>
+
+<h1>Barbearia Viola</h1>
+
+<h2>Agendar Horário</h2>
+
+
+<form>
+
+<form method="POST">
+
+<label>Serviço</label>
+
+<select name="servico">
+<option>Corte de Cabelo</option>
+<option>Barba</option>
+<option>Corte + Barba</option>
+</select>
+
+<label>Horário</label>
+
+<select name="horario">
+
+{% for h in horarios %}
+
+<option>{{ h }}</option>
+
+{% endfor %}
+
+</select>
+
+<button type="submit">Agendar</button>
+
+
+
+</div>
+
+</body>
+</html>

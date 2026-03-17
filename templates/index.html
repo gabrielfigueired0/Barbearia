@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Barbearia Viola</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="fundo"></div>
+
+<div class="card">
+
+<div class="topo">
+
+<div class="logo-box">
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo da Barbearia Viola">
+</div>
+
+<h1>BARBEARIA VIOLA</h1>
+<p>Sejá bem-vindo </p>
+
+</div>
+
+<div class="conteudo">
+
+<form method="POST">
+
+<label>Seu telefone:</label>
+
+<input type="tel" name="telefone" placeholder="(00) 00000-0000" required>
+
+<button type="submit">Entrar</button>
+
+</form>
+{% if mensagem %}
+<div class="mensagem {{ tipo }}">
+{{ mensagem }}
+</div>
+{% endif %}
+
+</div>
+
+<div class="rodape">
+Sistema da Barbearia Viola
+</div>
+
+</div>
+
+</body>
+</html>
