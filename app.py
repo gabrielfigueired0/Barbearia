@@ -1,19 +1,16 @@
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 import sqlite3
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY", "barbearia-viola-secret")
+app.secret_key = 'viola-barbearia-secret-2024'
 
-DB = 'agendamentos.db'
-ADMIN = os.getenv("ADMIN_TELEFONE", "7412345678")
+DB = 'barbearia.db'
 
+# ─────────────────────────────────────────
+# BANCO DE DADOS
+# ─────────────────────────────────────────
 
-# ── BANCO DE DADOS ─────────────────────────────────────────────────────────────
 def get_db():
     conn = sqlite3.connect(DB)
     conn.row_factory = sqlite3.Row
@@ -21,140 +18,296 @@ def get_db():
 
 def init_db():
     with get_db() as conn:
-        conn.execute('''
+        conn.executescript('''
+            CREATE TABLE IF NOT EXISTS clientes (
+                id        INTEGER PRIMARY KEY AUTOINCREMENT,
+                nome      TEXT    NOT NULL,
+                telefone  TEXT    NOT NULL UNIQUE,
+                criado_em TEXT    DEFAULT (datetime('now','localtime'))
+            );
+
             CREATE TABLE IF NOT EXISTS agendamentos (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                nome TEXT NOT NULL,
-                telefone TEXT NOT NULL,
-                servico TEXT NOT NULL,
-                preco TEXT NOT NULL,
-                data TEXT NOT NULL,
-                horario TEXT NOT NULL,
-                status TEXT DEFAULT 'confirmado',
-                criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
+                id           INTEGER PRIMARY KEY AUTOINCREMENT,
+                cliente_id   INTEGER NOT NULL,
+                profissional TEXT    NOT NULL,
+                servico      TEXT    NOT NULL,
+                horario      TEXT    NOT NULL,
+                valor        TEXT    NOT NULL,
+                valor_num    REAL    DEFAULT 0,
+                data         TEXT    DEFAULT (date('now','localtime')),
+                criado_em    TEXT    DEFAULT (datetime('now','localtime')),
+                FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+            );
         ''')
 
 init_db()
 
+# ─────────────────────────────────────────
+# CONFIG
+# ─────────────────────────────────────────
 
-# ── HORÁRIOS ───────────────────────────────────────────────────────────────────
-def gerar_horarios():
-    horarios = []
-    hora, minuto = 7, 30
-    while hora < 19 or (hora == 19 and minuto <= 30):
-        horarios.append(f"{hora:02d}:{minuto:02d}")
-        minuto += 30
-        if minuto == 60:
-            minuto = 0
-            hora += 1
-    return horarios
+HORARIOS = [
+    '08:00','08:30','09:00','09:30','10:00','10:30',
+    '11:00','11:30','13:00','13:30','14:00','14:30',
+    '15:00','15:30','16:00','16:30','17:00','17:30',
+]
 
-HORARIOS = gerar_horarios()
+PRECOS = {
+    'Corte de Cabelo': ('R$ 30', 30.0),
+    'Barba':           ('R$ 30', 30.0),
+    'Corte + Barba':   ('R$ 55', 55.0),
+    'Hidratação':      ('R$ 40', 40.0),
+}
 
+ADMIN_USUARIO = 'admin'
+ADMIN_SENHA   = 'viola2024'
 
-# ── LOGIN ──────────────────────────────────────────────────────────────────────
-@app.route("/", methods=["GET", "POST"])
+# ─────────────────────────────────────────
+# HELPERS
+# ─────────────────────────────────────────
+
+def formatar_reais(valor):
+    return f"R$ {valor:,.0f}".replace(',', '.')
+
+def calcular_lucro(conn, data_ini, data_fim):
+    rows = conn.execute(
+        '''SELECT COALESCE(SUM(valor_num), 0) AS total, COUNT(*) AS qtd
+           FROM agendamentos
+           WHERE data >= ? AND data <= ?''',
+        (data_ini, data_fim)
+    ).fetchone()
+    return rows['total'], rows['qtd']
+
+# ─────────────────────────────────────────
+# LOGIN CLIENTE
+# ─────────────────────────────────────────
+
+@app.route('/', methods=['GET'])
+def index():
+    return redirect(url_for('login'))
+
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    mensagem = ""
-    tipo = ""
+    if request.method == 'POST':
+        acao     = request.form.get('acao')
+        telefone = request.form.get('telefone', '').strip()
 
-    if request.method == "POST":
-        telefone = request.form.get("telefone", "").strip()
+        if acao == 'entrar':
+            if not telefone:
+                flash('Digite seu telefone.', 'erro')
+                return render_template('login.html', aba_ativa='entrar')
 
-        if telefone == ADMIN:
-            session["autenticado"] = True
-            return redirect(url_for("agenda"))
-        else:
-            mensagem = "Telefone não cadastrado!"
-            tipo = "erro"
-
-    return render_template("index.html", mensagem=mensagem, tipo=tipo)
-
-
-# ── AGENDAMENTO ────────────────────────────────────────────────────────────────
-@app.route("/agenda", methods=["GET", "POST"])
-def agenda():
-    if not session.get("autenticado"):
-        return redirect(url_for("login"))
-
-    mensagem = ""
-
-    if request.method == "POST":
-        nome        = request.form.get("nome", "").strip()
-        telefone    = request.form.get("telefone", "").strip()
-        profissional = request.form.get("profissional", "Qualquer")
-        servico     = request.form.get("servico", "")
-        preco       = request.form.get("preco", "")
-        data        = request.form.get("data", "")
-        horario     = request.form.get("horario", "")
-
-        if not horario:
-            mensagem = "Selecione um horário!"
-        else:
             with get_db() as conn:
-                # Verifica se horário já está ocupado na mesma data
-                ocupado = conn.execute(
-                    "SELECT 1 FROM agendamentos WHERE data = ? AND horario = ?",
-                    (data, horario)
+                cliente = conn.execute(
+                    'SELECT * FROM clientes WHERE telefone = ?', (telefone,)
                 ).fetchone()
 
-                if ocupado:
-                    mensagem = "Esse horário já foi agendado!"
-                else:
-                    conn.execute(
-                        '''INSERT INTO agendamentos
-                           (nome, telefone, servico, preco, data, horario)
-                           VALUES (?, ?, ?, ?, ?, ?)''',
-                        (nome, telefone, servico, preco, data, horario)
-                    )
-                    mensagem = "Agendamento realizado com sucesso!"
+            if not cliente:
+                flash('Número não encontrado. Crie uma conta primeiro.', 'erro')
+                return render_template('login.html', aba_ativa='entrar')
 
-    # Busca horários ocupados do banco para o dia atual
-    with get_db() as conn:
-        from datetime import date
-        hoje = date.today().isoformat()
-        ocupados = [
-            r["horario"] for r in conn.execute(
-                "SELECT horario FROM agendamentos WHERE data = ?", (hoje,)
-            ).fetchall()
-        ]
+            session['cliente_id']   = cliente['id']
+            session['cliente_nome'] = cliente['nome']
+            session['cliente_tel']  = cliente['telefone']
+            return redirect(url_for('agenda'))
 
-    return render_template(
-        "agendamento.html",
-        horarios=HORARIOS,
-        ocupados=ocupados,
-        mensagem=mensagem
-    )
+        elif acao == 'criar':
+            nome = request.form.get('nome', '').strip()
+            if not nome or not telefone:
+                flash('Preencha nome e telefone.', 'erro')
+                return render_template('login.html', aba_ativa='criar')
 
+            with get_db() as conn:
+                existente = conn.execute(
+                    'SELECT id FROM clientes WHERE telefone = ?', (telefone,)
+                ).fetchone()
 
-# ── MEUS AGENDAMENTOS (API) ────────────────────────────────────────────────────
-@app.route('/meus-agendamentos')
-def meus_agendamentos():
-    telefone = request.args.get('telefone', '').strip()
+                if existente:
+                    flash('Número já cadastrado. Entre na aba "Entrar".', 'erro')
+                    return render_template('login.html', aba_ativa='criar')
 
-    if not telefone:
-        return jsonify({'erro': 'Telefone não informado'}), 400
+                conn.execute(
+                    'INSERT INTO clientes (nome, telefone) VALUES (?, ?)',
+                    (nome, telefone)
+                )
+                conn.commit()
+                cliente = conn.execute(
+                    'SELECT * FROM clientes WHERE telefone = ?', (telefone,)
+                ).fetchone()
 
-    with get_db() as conn:
-        rows = conn.execute('''
-            SELECT nome, telefone, servico, preco, data, horario, status
-            FROM agendamentos
-            WHERE telefone = ?
-            ORDER BY criado_em DESC
-        ''', (telefone,)).fetchall()
+            session['cliente_id']   = cliente['id']
+            session['cliente_nome'] = cliente['nome']
+            session['cliente_tel']  = cliente['telefone']
+            flash(f'Bem-vindo, {nome}! Conta criada com sucesso.', 'ok')
+            return redirect(url_for('agenda'))
 
-    return jsonify([dict(r) for r in rows])
+    return render_template('login.html', aba_ativa='entrar')
 
-
-# ── LOGOUT ─────────────────────────────────────────────────────────────────────
-@app.route("/logout")
+@app.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for("login"))
+    return redirect(url_for('login'))
 
+# ─────────────────────────────────────────
+# AGENDA (CLIENTE)
+# ─────────────────────────────────────────
 
-# ── MAIN ───────────────────────────────────────────────────────────────────────
-if __name__ == "__main__":
-    debug = os.getenv("FLASK_DEBUG", "false").lower() == "true"
-    app.run(debug=debug)
+@app.route('/agenda', methods=['GET', 'POST'])
+def agenda():
+    if 'cliente_id' not in session:
+        return redirect(url_for('login'))
+
+    mensagem = None
+    hoje = datetime.now().strftime('%Y-%m-%d')
+
+    with get_db() as conn:
+        ocupados_rows = conn.execute(
+            'SELECT horario FROM agendamentos WHERE data = ?', (hoje,)
+        ).fetchall()
+        ocupados = [r['horario'] for r in ocupados_rows]
+
+    if request.method == 'POST':
+        profissional = request.form.get('profissional', '').strip()
+        servico      = request.form.get('servico', '').strip()
+        horario      = request.form.get('horario', '').strip()
+
+        valor_str, valor_num = PRECOS.get(servico, ('R$ 30', 30.0))
+
+        if not horario:
+            mensagem = 'Escolha um horário.'
+        elif horario in ocupados:
+            mensagem = 'Horário já ocupado. Escolha outro.'
+        else:
+            with get_db() as conn:
+                conn.execute(
+                    '''INSERT INTO agendamentos
+                       (cliente_id, profissional, servico, horario, valor, valor_num)
+                       VALUES (?, ?, ?, ?, ?, ?)''',
+                    (session['cliente_id'], profissional, servico, horario, valor_str, valor_num)
+                )
+                conn.commit()
+                ocupados.append(horario)
+            mensagem = 'Agendamento realizado com sucesso!'
+
+    return render_template(
+        'agendamento.html',
+        horarios=HORARIOS,
+        ocupados=ocupados,
+        mensagem=mensagem,
+        nome_cliente=session.get('cliente_nome', ''),
+    )
+
+# ─────────────────────────────────────────
+# ADMIN — LOGIN
+# ─────────────────────────────────────────
+
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    erro = None
+    if request.method == 'POST':
+        u = request.form.get('usuario', '')
+        s = request.form.get('senha', '')
+        if u == ADMIN_USUARIO and s == ADMIN_SENHA:
+            session['admin'] = True
+            return redirect(url_for('admin_painel'))
+        erro = 'Usuário ou senha incorretos.'
+    return render_template('admin_login.html', erro=erro)
+
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin', None)
+    return redirect(url_for('admin_login'))
+
+# ─────────────────────────────────────────
+# ADMIN — PAINEL
+# ─────────────────────────────────────────
+
+@app.route('/admin')
+def admin_painel():
+    if not session.get('admin'):
+        return redirect(url_for('admin_login'))
+
+    hoje  = datetime.now()
+    s_ini = (hoje - timedelta(days=hoje.weekday())).strftime('%Y-%m-%d')   # segunda-feira
+    m_ini = hoje.strftime('%Y-%m-01')                                       # primeiro do mês
+    hoje_str = hoje.strftime('%Y-%m-%d')
+
+    with get_db() as conn:
+        # Lucro
+        val_dia,     qtd_dia     = calcular_lucro(conn, hoje_str, hoje_str)
+        val_semana,  qtd_semana  = calcular_lucro(conn, s_ini,    hoje_str)
+        val_mes,     qtd_mes     = calcular_lucro(conn, m_ini,    hoje_str)
+
+        # Agendamentos de hoje com dados do cliente
+        ags_hoje = conn.execute(
+            '''SELECT a.*, c.nome AS nome_cliente, c.telefone
+               FROM agendamentos a
+               JOIN clientes c ON c.id = a.cliente_id
+               WHERE a.data = ?
+               ORDER BY a.horario ASC''',
+            (hoje_str,)
+        ).fetchall()
+
+        # Clientes
+        clientes = conn.execute(
+            'SELECT * FROM clientes ORDER BY criado_em DESC'
+        ).fetchall()
+
+    # Mapa horario -> agendamento para o template
+    mapa = {row['horario']: row for row in ags_hoje}
+
+    return render_template(
+        'admin.html',
+        todos_horarios      = HORARIOS,
+        agendamentos_hoje   = ags_hoje,
+        agendamentos_hoje_map = mapa,
+        clientes            = clientes,
+        lucro_dia           = formatar_reais(val_dia),
+        lucro_semana        = formatar_reais(val_semana),
+        lucro_mes           = formatar_reais(val_mes),
+        qtd_dia             = qtd_dia,
+        qtd_semana          = qtd_semana,
+        qtd_mes             = qtd_mes,
+    )
+
+# ─────────────────────────────────────────
+# ADMIN — REMOVER AGENDAMENTO
+# ─────────────────────────────────────────
+
+@app.route('/admin/remover', methods=['POST'])
+def admin_remover():
+    if not session.get('admin'):
+        return redirect(url_for('admin_login'))
+
+    ag_id = request.form.get('agendamento_id')
+    if ag_id:
+        with get_db() as conn:
+            conn.execute('DELETE FROM agendamentos WHERE id = ?', (ag_id,))
+            conn.commit()
+        flash('Agendamento removido com sucesso.', 'ok')
+    else:
+        flash('Erro ao remover agendamento.', 'erro')
+
+    return redirect(url_for('admin_painel'))
+
+# ─────────────────────────────────────────
+# ADMIN — RESETAR DIA
+# ─────────────────────────────────────────
+
+@app.route('/admin/resetar-dia', methods=['POST'])
+def admin_resetar_dia():
+    if not session.get('admin'):
+        return redirect(url_for('admin_login'))
+
+    hoje = datetime.now().strftime('%Y-%m-%d')
+    with get_db() as conn:
+        conn.execute('DELETE FROM agendamentos WHERE data = ?', (hoje,))
+        conn.commit()
+
+    flash('Todos os horários de hoje foram resetados.', 'ok')
+    return redirect(url_for('admin_painel'))
+
+# ─────────────────────────────────────────
+
+if __name__ == '__main__':
+    app.run(debug=True)

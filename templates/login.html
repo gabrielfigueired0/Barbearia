@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Barbearia Viola — Acesso</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #C9A84C;
+      --gold-light: #e8c96a;
+      --dark: #1A1A1A;
+      --dark2: #242420;
+      --cream: #FAF8F3;
+      --text: #2C2C2A;
+      --muted: #888780;
+      --border: rgba(201,168,76,0.2);
+      --card: rgba(255,255,255,0.04);
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--dark);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── FUNDO DECORATIVO ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,168,76,0.18) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 100% 100%, rgba(201,168,76,0.07) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .grade-fundo {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    /* ── LOGO ── */
+    .logo-wrap {
+      text-align: center;
+      margin-bottom: 2.25rem;
+      position: relative;
+      animation: fadeDown .5s ease both;
+    }
+
+    .logo-circle {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #a07830);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin: 0 auto .9rem;
+      box-shadow: 0 0 40px rgba(201,168,76,0.3), 0 0 0 1px rgba(201,168,76,0.2);
+    }
+
+    .brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+
+    .brand span { color: var(--gold); }
+
+    .tagline {
+      font-size: 10px;
+      color: #666;
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
+      margin-top: 5px;
+    }
+
+    /* ── CARD ── */
+    .card {
+      width: 100%;
+      max-width: 400px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(201,168,76,0.15);
+      border-radius: 24px;
+      padding: 2rem 1.75rem;
+      backdrop-filter: blur(12px);
+      position: relative;
+      animation: fadeUp .5s ease .1s both;
+    }
+
+    /* ── ABAS ── */
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: rgba(0,0,0,0.3);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 1.75rem;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .tab-btn {
+      padding: 10px;
+      border: none;
+      background: transparent;
+      color: #666;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all .25s ease;
+      letter-spacing: 0.3px;
+    }
+
+    .tab-btn.ativo {
+      background: var(--gold);
+      color: var(--dark);
+      box-shadow: 0 2px 12px rgba(201,168,76,0.3);
+    }
+
+    /* ── PAINÉIS ── */
+    .painel { display: none; }
+    .painel.ativo { display: block; }
+
+    /* ── FORMULÁRIO ── */
+    .campo-wrap {
+      margin-bottom: 1rem;
+    }
+
+    .campo-label {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #666;
+      margin-bottom: 7px;
+      font-weight: 500;
+    }
+
+    .campo-input {
+      width: 100%;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 13px 16px;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      transition: border-color .2s, box-shadow .2s;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .campo-input::placeholder { color: #444; }
+
+    .campo-input:focus {
+      border-color: rgba(201,168,76,0.5);
+      box-shadow: 0 0 0 3px rgba(201,168,76,0.08);
+    }
+
+    /* ── BOTÃO ── */
+    .btn-entrar {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--gold), #a07830);
+      color: var(--dark);
+      border: none;
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      margin-top: .5rem;
+      transition: opacity .2s, transform .1s, box-shadow .2s;
+      box-shadow: 0 4px 20px rgba(201,168,76,0.25);
+    }
+
+    .btn-entrar:hover {
+      opacity: .9;
+      box-shadow: 0 6px 28px rgba(201,168,76,0.4);
+    }
+
+    .btn-entrar:active { transform: scale(0.98); }
+
+    /* ── MENSAGEM ── */
+    .msg-erro {
+      background: rgba(163,45,45,0.15);
+      border: 1px solid rgba(163,45,45,0.3);
+      color: #f07070;
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 13px;
+      margin-bottom: 1rem;
+      text-align: center;
+      display: none;
+    }
+
+    .msg-erro.visivel { display: block; }
+
+    /* ── SEPARADOR ── */
+    .separador {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 1.25rem 0;
+    }
+
+    .sep-linha { flex: 1; height: 0.5px; background: rgba(255,255,255,0.07); }
+    .sep-texto { font-size: 10px; color: #444; letter-spacing: 2px; text-transform: uppercase; }
+
+    /* ── DICA ── */
+    .dica {
+      text-align: center;
+      font-size: 12px;
+      color: #444;
+      margin-top: 1.25rem;
+    }
+
+    .dica span {
+      color: var(--gold);
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .dica span:hover { text-decoration: underline; }
+
+    /* ── RODAPÉ ADMIN ── */
+    .link-admin {
+      margin-top: 1.5rem;
+      font-size: 11px;
+      color: #333;
+      text-align: center;
+      letter-spacing: 0.5px;
+      animation: fadeUp .5s ease .2s both;
+    }
+
+    .link-admin a {
+      color: #444;
+      text-decoration: none;
+      transition: color .2s;
+    }
+
+    .link-admin a:hover { color: #666; }
+
+    /* ── FLASH DO FLASK ── */
+    .flash-msg {
+      background: rgba(59,109,17,0.15);
+      border: 1px solid rgba(59,109,17,0.3);
+      color: #8fcf50;
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 13px;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .flash-msg.erro {
+      background: rgba(163,45,45,0.15);
+      border-color: rgba(163,45,45,0.3);
+      color: #f07070;
+    }
+
+    /* ── ANIMAÇÕES ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="grade-fundo"></div>
+
+  <!-- LOGO -->
+  <div class="logo-wrap">
+    <div class="logo-circle"><img src="{{ url_for('static', filename='img/logo.jpeg') }}" alt="logo" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;"></div>
+    </div>
+    <div class="brand">Barbearia <span>Viola</span></div>
+    <div class="tagline">Estilo &amp; Tradição</div>
+  </div>
+
+  <!-- CARD COM ABAS -->
+  <div class="card">
+
+    <!-- Mensagens flash do Flask -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <div class="flash-msg {% if cat == 'erro' %}erro{% endif %}">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <!-- ABAS -->
+    <div class="tabs">
+      <button class="tab-btn ativo" id="tab-entrar" onclick="mudarAba('entrar')">Entrar</button>
+      <button class="tab-btn" id="tab-criar"  onclick="mudarAba('criar')">Criar conta</button>
+    </div>
+
+    <!-- ── PAINEL: ENTRAR ── -->
+    <div class="painel ativo" id="painel-entrar">
+      <div id="erro-entrar" class="msg-erro"></div>
+      <form method="POST" action="/login">
+        <input type="hidden" name="acao" value="entrar">
+
+        <div class="campo-wrap">
+          <label class="campo-label" for="tel-entrar">Seu telefone</label>
+          <input class="campo-input" type="tel" id="tel-entrar" name="telefone"
+                 placeholder="(00) 00000-0000" maxlength="15" autocomplete="tel"
+                 oninput="mascaraTel(this)" required>
+        </div>
+
+        <button type="submit" class="btn-entrar">Entrar</button>
+      </form>
+
+      <div class="dica">
+        Primeira vez aqui?
+        <span onclick="mudarAba('criar')">Criar conta</span>
+      </div>
+    </div>
+
+    <!-- ── PAINEL: CRIAR CONTA ── -->
+    <div class="painel" id="painel-criar">
+      <div id="erro-criar" class="msg-erro"></div>
+      <form method="POST" action="/login">
+        <input type="hidden" name="acao" value="criar">
+
+        <div class="campo-wrap">
+          <label class="campo-label" for="nome-criar">Seu nome</label>
+          <input class="campo-input" type="text" id="nome-criar" name="nome"
+                 placeholder="Como você se chama?" autocomplete="name" required>
+        </div>
+
+        <div class="campo-wrap">
+          <label class="campo-label" for="tel-criar">Seu telefone</label>
+          <input class="campo-input" type="tel" id="tel-criar" name="telefone"
+                 placeholder="(00) 00000-0000" maxlength="15" autocomplete="tel"
+                 oninput="mascaraTel(this)" required>
+        </div>
+
+        <button type="submit" class="btn-entrar">Criar conta e entrar</button>
+      </form>
+
+      <div class="dica">
+        Já tem conta?
+        <span onclick="mudarAba('entrar')">Entrar</span>
+      </div>
+    </div>
+
+  </div><!-- /card -->
+
+  <div class="link-admin">
+    <a href="/admin/login">Área administrativa</a>
+  </div>
+
+  <script>
+    // Abre a aba correta se o Flask indicar erro de cadastro
+    var abaInicial = "{{ aba_ativa if aba_ativa else 'entrar' }}";
+    if (abaInicial === 'criar') mudarAba('criar');
+
+    function mudarAba(qual) {
+      document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('ativo'); });
+      document.querySelectorAll('.painel').forEach(function(p) { p.classList.remove('ativo'); });
+      document.getElementById('tab-' + qual).classList.add('ativo');
+      document.getElementById('painel-' + qual).classList.add('ativo');
+    }
+
+    function mascaraTel(input) {
+      var v = input.value.replace(/\D/g, '').slice(0, 11);
+      if (v.length > 10) {
+        input.value = '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7);
+      } else if (v.length > 6) {
+        input.value = '(' + v.slice(0,2) + ') ' + v.slice(2,6) + '-' + v.slice(6);
+      } else if (v.length > 2) {
+        input.value = '(' + v.slice(0,2) + ') ' + v.slice(2);
+      } else if (v.length > 0) {
+        input.value = '(' + v;
+      }
+    }
+  </script>
+
+</body>
+</html>

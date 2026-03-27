@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — Barbearia Viola</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #C9A84C;
+      --dark: #111110;
+      --dark2: #1A1A18;
+      --text: #E8E4DA;
+      --muted: #666460;
+      --border: rgba(255,255,255,0.07);
+      --red: #E05252;
+      --green: #6BBF59;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--dark);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      background: var(--dark2);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
+    }
+    .header-logo { display: flex; align-items: center; gap: 12px; }
+    .logo-circle {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #8a6020);
+      display: flex; align-items: center; justify-content: center; font-size: 16px;
+    }
+    .brand { font-family: 'Playfair Display', serif; font-size: 17px; color: #fff; line-height: 1.1; }
+    .brand span { color: var(--gold); }
+    .brand-sub { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    .data-badge {
+      font-size: 11px; color: var(--muted);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      padding: 5px 12px; border-radius: 20px;
+    }
+    .btn-sair {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px; padding: 6px 14px; border-radius: 20px;
+      cursor: pointer; text-decoration: none; transition: all .2s;
+    }
+    .btn-sair:hover { border-color: var(--red); color: var(--red); }
+
+    /* ── CONTAINER ── */
+    .container { max-width: 1000px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+    /* ── STATS ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: var(--dark2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem 1.25rem 1rem;
+      position: relative; overflow: hidden;
+      transition: border-color .2s;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0.5;
+    }
+    .stat-card:hover { border-color: rgba(201,168,76,0.3); }
+    .stat-icon { position: absolute; top: 1rem; right: 1rem; font-size: 22px; opacity: 0.15; }
+    .stat-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); font-weight: 500; margin-bottom: 8px; }
+    .stat-valor { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--gold); line-height: 1; margin-bottom: 4px; }
+    .stat-info  { font-size: 11px; color: var(--muted); }
+
+    /* ── SEC HEADER ── */
+    .sec-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1rem; gap: 10px; flex-wrap: wrap;
+    }
+    .sec-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px; color: #fff;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .count-badge {
+      background: var(--gold); color: var(--dark);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px; font-weight: 600;
+      padding: 2px 9px; border-radius: 20px;
+    }
+
+    /* ── BTN RESET ── */
+    .btn-reset {
+      background: rgba(224,82,82,0.1);
+      border: 1px solid rgba(224,82,82,0.3);
+      color: var(--red);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px; font-weight: 500;
+      padding: 8px 16px; border-radius: 10px;
+      cursor: pointer; transition: all .2s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .btn-reset:hover { background: rgba(224,82,82,0.2); border-color: var(--red); }
+
+    /* ── GRADE HORÁRIOS ── */
+    .horarios-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
+      margin-bottom: 2.5rem;
+    }
+    .horario-slot {
+      background: var(--dark2);
+      border: 1px solid var(--border);
+      border-radius: 14px; padding: 1rem;
+      transition: border-color .2s;
+    }
+    .horario-slot.ocupado { border-color: rgba(201,168,76,0.25); background: rgba(201,168,76,0.04); }
+    .horario-slot.livre   { opacity: 0.4; }
+    .slot-hora   { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--gold); margin-bottom: 8px; }
+    .slot-livre-txt { font-size: 12px; color: var(--muted); font-style: italic; }
+    .slot-cliente { font-size: 13px; font-weight: 500; color: #fff; margin-bottom: 2px; }
+    .slot-tel     { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+    .slot-serv    { font-size: 12px; color: var(--text); margin-bottom: 2px; }
+    .slot-valor   { font-size: 12px; color: var(--gold); font-weight: 500; margin-bottom: 10px; }
+    .btn-remover {
+      width: 100%; padding: 7px;
+      background: rgba(224,82,82,0.08);
+      border: 1px solid rgba(224,82,82,0.25);
+      color: var(--red);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px; font-weight: 500;
+      border-radius: 8px; cursor: pointer; transition: all .2s;
+    }
+    .btn-remover:hover { background: rgba(224,82,82,0.18); border-color: var(--red); }
+
+    /* ── TABELA CLIENTES ── */
+    .tabela-wrap {
+      background: var(--dark2);
+      border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden;
+      margin-bottom: 2.5rem;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: rgba(0,0,0,0.3); }
+    thead th {
+      padding: 11px 16px; font-size: 10px;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--muted); font-weight: 500; text-align: left;
+    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+    tbody tr:last-child { border: none; }
+    tbody tr:hover { background: rgba(255,255,255,0.02); }
+    td { padding: 11px 16px; font-size: 13px; vertical-align: middle; }
+    .td-nome { font-weight: 500; color: #fff; }
+    .td-tel  { color: var(--muted); font-size: 12px; }
+    .td-data { color: var(--muted); font-size: 11px; }
+
+    /* ── VAZIO ── */
+    .vazio { text-align: center; padding: 2.5rem; color: var(--muted); font-size: 13px; }
+
+    /* ── FLASH ── */
+    .flash {
+      border-radius: 12px; padding: 12px 16px; font-size: 13px;
+      margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px;
+    }
+    .flash.ok   { background: rgba(107,191,89,0.1); border: 1px solid rgba(107,191,89,0.25); color: var(--green); }
+    .flash.erro { background: rgba(224,82,82,0.1);  border: 1px solid rgba(224,82,82,0.25);  color: var(--red); }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75); z-index: 200;
+      align-items: center; justify-content: center; padding: 1.5rem;
+    }
+    .modal-overlay.aberto { display: flex; }
+    .modal-box {
+      background: var(--dark2);
+      border: 1px solid rgba(224,82,82,0.3);
+      border-radius: 20px; padding: 2rem 1.75rem 1.5rem;
+      width: 100%; max-width: 360px;
+      text-align: center; animation: popUp .2s ease;
+    }
+    @keyframes popUp {
+      from { opacity: 0; transform: scale(.95) translateY(10px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .modal-icone  { font-size: 36px; margin-bottom: 1rem; }
+    .modal-titulo { font-family: 'Playfair Display', serif; font-size: 18px; color: #fff; margin-bottom: .5rem; }
+    .modal-desc   { font-size: 13px; color: var(--muted); margin-bottom: 1.5rem; line-height: 1.6; }
+    .modal-info   { background: rgba(255,255,255,0.04); border-radius: 10px; padding: 10px 14px; margin-bottom: 1.5rem; font-size: 13px; color: var(--text); }
+    .modal-info strong { color: var(--gold); }
+    .modal-btns   { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .modal-cancelar {
+      padding: 11px; background: transparent;
+      border: 1px solid var(--border); color: var(--muted);
+      border-radius: 10px; font-family: 'DM Sans', sans-serif;
+      font-size: 13px; cursor: pointer; transition: all .2s;
+    }
+    .modal-cancelar:hover { border-color: #555; color: #fff; }
+    .modal-confirmar {
+      padding: 11px; background: rgba(224,82,82,0.15);
+      border: 1px solid rgba(224,82,82,0.4); color: var(--red);
+      border-radius: 10px; font-family: 'DM Sans', sans-serif;
+      font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s;
+    }
+    .modal-confirmar:hover { background: rgba(224,82,82,0.25); }
+
+    @media (max-width: 600px) {
+      .hide-mob { display: none; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .horarios-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 400px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .horarios-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-logo">
+      <div class="logo-circle">✂</div>
+      <div>
+        <div class="brand">Barbearia <span>Viola</span></div>
+        <div class="brand-sub">Painel Admin</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="data-badge" id="data-hoje"></div>
+      <a href="/admin/logout" class="btn-sair">Sair</a>
+    </div>
+  </div>
+
+  <div class="container">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <div class="flash {{ cat }}">{{ '✓' if cat == 'ok' else '✕' }} {{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <!-- LUCRO -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📅</div>
+        <div class="stat-label">Lucro hoje</div>
+        <div class="stat-valor">{{ lucro_dia }}</div>
+        <div class="stat-info">{{ qtd_dia }} agendamento{{ 's' if qtd_dia != 1 else '' }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📆</div>
+        <div class="stat-label">Lucro na semana</div>
+        <div class="stat-valor">{{ lucro_semana }}</div>
+        <div class="stat-info">{{ qtd_semana }} agendamento{{ 's' if qtd_semana != 1 else '' }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🗓</div>
+        <div class="stat-label">Lucro no mês</div>
+        <div class="stat-valor">{{ lucro_mes }}</div>
+        <div class="stat-info">{{ qtd_mes }} agendamento{{ 's' if qtd_mes != 1 else '' }}</div>
+      </div>
+    </div>
+
+    <!-- HORÁRIOS DO DIA -->
+    <div class="sec-header">
+      <div class="sec-title">
+        Horários de hoje
+        <span class="count-badge">{{ agendamentos_hoje | length }}</span>
+      </div>
+      <button class="btn-reset" onclick="abrirModalReset()">🔄 Resetar dia</button>
+    </div>
+
+    <div class="horarios-grid">
+      {% for h in todos_horarios %}
+        {% set ag = agendamentos_hoje_map.get(h) %}
+        {% if ag %}
+          <div class="horario-slot ocupado">
+            <div class="slot-hora">{{ h }}</div>
+            <div class="slot-cliente">{{ ag.nome_cliente }}</div>
+            <div class="slot-tel">{{ ag.telefone }}</div>
+            <div class="slot-serv">{{ ag.servico }} · {{ ag.profissional }}</div>
+            <div class="slot-valor">{{ ag.valor }}</div>
+            <button class="btn-remover"
+              onclick="abrirModalRemover({{ ag.id }}, '{{ ag.nome_cliente }}', '{{ h }}')">
+              ✕ Remover agendamento
+            </button>
+          </div>
+        {% else %}
+          <div class="horario-slot livre">
+            <div class="slot-hora">{{ h }}</div>
+            <div class="slot-livre-txt">Disponível</div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- CLIENTES -->
+    <div class="sec-header">
+      <div class="sec-title">
+        Clientes cadastrados
+        <span class="count-badge">{{ clientes | length }}</span>
+      </div>
+    </div>
+
+    <div class="tabela-wrap">
+      {% if clientes %}
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Nome</th><th>Telefone</th><th class="hide-mob">Cadastrado em</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in clientes %}
+          <tr>
+            <td class="td-data">{{ c.id }}</td>
+            <td class="td-nome">{{ c.nome }}</td>
+            <td class="td-tel">{{ c.telefone }}</td>
+            <td class="td-data hide-mob">{{ c.criado_em }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+        <div class="vazio">Nenhum cliente cadastrado ainda.</div>
+      {% endif %}
+    </div>
+
+  </div>
+
+  <!-- MODAL REMOVER -->
+  <div id="modal-remover" class="modal-overlay" onclick="fecharModalFora(event,'modal-remover')">
+    <div class="modal-box">
+      <div class="modal-icone">🗑</div>
+      <div class="modal-titulo">Remover agendamento?</div>
+      <div class="modal-desc">Essa ação não pode ser desfeita. O horário voltará a ficar disponível.</div>
+      <div class="modal-info" id="modal-remover-info"></div>
+      <div class="modal-btns">
+        <button class="modal-cancelar" onclick="fecharModal('modal-remover')">Cancelar</button>
+        <form method="POST" action="/admin/remover" style="display:contents">
+          <input type="hidden" name="agendamento_id" id="input-ag-id">
+          <button type="submit" class="modal-confirmar">Remover</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL RESET -->
+  <div id="modal-reset" class="modal-overlay" onclick="fecharModalFora(event,'modal-reset')">
+    <div class="modal-box">
+      <div class="modal-icone">⚠️</div>
+      <div class="modal-titulo">Resetar todos os horários?</div>
+      <div class="modal-desc">Todos os agendamentos de <strong style="color:#fff">hoje</strong> serão removidos permanentemente. Use apenas ao fim do expediente.</div>
+      <div class="modal-btns">
+        <button class="modal-cancelar" onclick="fecharModal('modal-reset')">Cancelar</button>
+        <form method="POST" action="/admin/resetar-dia" style="display:contents">
+          <button type="submit" class="modal-confirmar">Confirmar reset</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var d = new Date();
+    var dias   = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+    var meses  = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    document.getElementById('data-hoje').textContent =
+      dias[d.getDay()] + ', ' + d.getDate() + ' ' + meses[d.getMonth()] + ' ' + d.getFullYear();
+
+    function abrirModalRemover(id, nome, hora) {
+      document.getElementById('input-ag-id').value = id;
+      document.getElementById('modal-remover-info').innerHTML =
+        '<strong>' + nome + '</strong> — ' + hora;
+      document.getElementById('modal-remover').classList.add('aberto');
+    }
+
+    function abrirModalReset() {
+      document.getElementById('modal-reset').classList.add('aberto');
+    }
+
+    function fecharModal(id) {
+      document.getElementById(id).classList.remove('aberto');
+    }
+
+    function fecharModalFora(e, id) {
+      if (e.target === document.getElementById(id)) fecharModal(id);
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        fecharModal('modal-remover');
+        fecharModal('modal-reset');
+      }
+    });
+  </script>
+
+</body>
+</html>

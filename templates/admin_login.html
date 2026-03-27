@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — Barbearia Viola</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --gold: #C9A84C; --dark: #1A1A1A; --muted: #888780; --border: #e8e4da; --card: #fff;
+    }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    body::before {
+      content:'';
+      position:fixed;
+      inset:0;
+      background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(201,168,76,0.13) 0%, transparent 60%);
+      pointer-events:none;
+    }
+    .card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(201,168,76,0.15);
+      border-radius: 22px;
+      padding: 2.25rem 1.75rem;
+      width: 100%;
+      max-width: 360px;
+    }
+    .logo {
+      text-align: center;
+      margin-bottom: 1.75rem;
+    }
+    .logo-circle {
+      width: 58px; height: 58px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #a07830);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin: 0 auto .75rem;
+    }
+    .brand { font-family: 'Playfair Display', serif; font-size: 20px; color: #fff; }
+    .brand span { color: var(--gold); }
+    .subtitulo { font-size: 11px; color: #555; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; }
+    .campo-wrap { margin-bottom: .9rem; }
+    .campo-label { display: block; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #555; margin-bottom: 6px; }
+    .campo-input {
+      width: 100%;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 11px;
+      padding: 12px 15px;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .campo-input:focus { border-color: rgba(201,168,76,0.45); }
+    .campo-input::placeholder { color: #444; }
+    .btn {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, var(--gold), #a07830);
+      color: var(--dark);
+      border: none;
+      border-radius: 11px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: .5rem;
+      transition: opacity .2s;
+    }
+    .btn:hover { opacity: .88; }
+    .erro {
+      background: rgba(163,45,45,0.15);
+      border: 1px solid rgba(163,45,45,0.3);
+      color: #f07070;
+      border-radius: 9px;
+      padding: 10px 14px;
+      font-size: 13px;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .voltar { text-align: center; margin-top: 1.25rem; }
+    .voltar a { font-size: 12px; color: #444; text-decoration: none; }
+    .voltar a:hover { color: #888; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">
+      <div class="logo-circle">✂</div>
+      <div class="brand">Barbearia <span>Viola</span></div>
+      <div class="subtitulo">Área Administrativa</div>
+    </div>
+
+    {% if erro %}
+      <div class="erro">{{ erro }}</div>
+    {% endif %}
+
+    <form method="POST" action="/admin/login">
+      <div class="campo-wrap">
+        <label class="campo-label" for="usuario">Usuário</label>
+        <input class="campo-input" type="text" id="usuario" name="usuario" placeholder="admin" required>
+      </div>
+      <div class="campo-wrap">
+        <label class="campo-label" for="senha">Senha</label>
+        <input class="campo-input" type="password" id="senha" name="senha" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn">Acessar painel</button>
+    </form>
+
+    <div class="voltar"><a href="/login">← Voltar ao início</a></div>
+  </div>
+</body>
+</html>

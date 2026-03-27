@@ -174,23 +174,19 @@
     .serv-card:hover { border-color: var(--gold); }
     .serv-card.selected { border-color: var(--gold); background: #fffbf0; }
 
-   .serv-img {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    overflow: hidden;
-   }
+    .serv-img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+    }
 
-   .serv-img img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    display: block;
-   }
-
-    /* Se você tiver imagens reais, substitua o emoji por:
-       <img src="{{ url_for('static', filename='img/corte.jpg') }}" alt="Corte" style="width:100%;height:88px;object-fit:cover;">
-    */
+    .serv-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
 
     .serv-info { padding: 10px 12px; }
     .serv-name { font-size: 13px; font-weight: 500; }
@@ -251,7 +247,7 @@
     .summary-val { font-weight: 500; }
     .summary-price { color: var(--gold); font-weight: 500; }
 
-    /* ── BOTÃO ── */
+    /* ── BOTÃO AGENDAR ── */
     .btn-agendar {
       width: 100%;
       padding: 16px;
@@ -272,6 +268,32 @@
     .btn-agendar:active { transform: scale(0.98); }
     .btn-agendar:disabled { background: #ccc; cursor: not-allowed; }
 
+    /* ── BOTÃO VER AGENDAMENTO ── */
+    .btn-ver-agendamento {
+      width: 100%;
+      padding: 14px;
+      background: transparent;
+      color: var(--gold);
+      border: 1.5px solid var(--gold);
+      border-radius: 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: background .2s, color .2s;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-ver-agendamento:hover {
+      background: var(--gold);
+      color: #fff;
+    }
+
     /* ── MENSAGENS ── */
     .msg {
       border-radius: 12px;
@@ -283,6 +305,104 @@
 
     .msg.sucesso { background: #eaf3de; color: #3B6D11; }
     .msg.erro    { background: #fcebeb; color: #A32D2D; }
+
+    /* ── POPUP AGENDAMENTO ── */
+    .popup-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .popup-overlay.aberto {
+      display: flex;
+    }
+
+    .popup-box {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 2rem 1.5rem 1.5rem;
+      width: 100%;
+      max-width: 360px;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+      animation: popupEntrar .25s ease;
+    }
+
+    @keyframes popupEntrar {
+      from { opacity: 0; transform: translateY(20px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .popup-fechar {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      background: #f5f2ea;
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      font-size: 14px;
+      color: var(--muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .2s;
+    }
+
+    .popup-fechar:hover { background: var(--border); color: var(--text); }
+
+    .popup-icone {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #a07830);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin: 0 auto 1rem;
+    }
+
+    .popup-titulo {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      text-align: center;
+      margin-bottom: 1.25rem;
+      color: var(--dark);
+    }
+
+    .popup-linha {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 0.5px solid var(--border);
+      font-size: 14px;
+    }
+
+    .popup-linha:last-of-type { border-bottom: none; }
+
+    .popup-chave { color: var(--muted); font-size: 13px; }
+
+    .popup-valor { font-weight: 500; color: var(--dark); }
+
+    .popup-valor.dourado { color: var(--gold); font-weight: 600; }
+
+    .popup-rodape {
+      margin-top: 1.25rem;
+      padding-top: 1rem;
+      border-top: 0.5px solid var(--border);
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
   </style>
 </head>
 <body>
@@ -290,7 +410,10 @@
   <div class="hero">
     <a href="/logout" class="logout-btn">Sair</a>
     <div class="hero-inner">
-      <div class="logo-circle">✂</div>
+      <div class="logo-circle">
+        <img src="{{ url_for('static', filename='img/logo.jpeg') }}" alt="logo" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
+      </div>
+      </div>
       <div class="brand">Barbearia <span>Viola</span></div>
       <div class="tagline">Estilo &amp; Tradição</div>
     </div>
@@ -301,8 +424,8 @@
     <!-- PROFISSIONAL -->
     <div class="step">
       <div class="section-label">Escolha o profissional</div>
-      <div class="prof-grid">
-        <div class="prof-card selected" onclick="selectProf(this,'Carlos')" data-prof="Carlos">
+      <div class="prof-grid" style="display:flex; justify-content:center;">
+        <div class="prof-card selected" onclick="selectProf(this,'Carlos')" data-prof="Carlos" style="width:160px;">
           <div class="prof-avatar" style="background:linear-gradient(135deg,#C9A84C,#a07830)">C</div>
           <div class="prof-name">Carlos</div>
           <div class="prof-role">Barbeiro Sênior</div>
@@ -312,57 +435,57 @@
 
     <div class="divider"><div class="divider-line"></div><div class="divider-text">serviço</div><div class="divider-line"></div></div>
 
-<!-- SERVIÇO -->
-<div class="step">
-  <div class="section-label">Escolha o serviço</div>
-  <div class="services-grid">
+    <!-- SERVIÇO -->
+    <div class="step">
+      <div class="section-label">Escolha o serviço</div>
+      <div class="services-grid">
 
-    <div class="serv-card selected" onclick="selectServ(this,'Corte de Cabelo','R$ 30','30 min')" data-serv="Corte de Cabelo" data-price="R$ 30">
-      <div class="serv-img">
-        <img src="{{ url_for('static', filename='img/corte3.jpg') }}" alt="Corte de Cabelo">
-      </div>
-      <div class="serv-info">
-        <div class="serv-name">Corte de Cabelo</div>
-        <div class="serv-price">R$ 30</div>
-        <div class="serv-time">30 min</div>
+        <div class="serv-card selected" onclick="selectServ(this,'Corte de Cabelo','R$ 30','30 min')" data-serv="Corte de Cabelo" data-price="R$ 30">
+          <div class="serv-img">
+            <img src="{{ url_for('static', filename='img/corte3.jpg') }}" alt="Corte de Cabelo">
+          </div>
+          <div class="serv-info">
+            <div class="serv-name">Corte de Cabelo</div>
+            <div class="serv-price">R$ 30</div>
+            <div class="serv-time">30 min</div>
+          </div>
+        </div>
+
+        <div class="serv-card" onclick="selectServ(this,'Barba','R$ 30','30 min')" data-serv="Barba" data-price="R$ 30">
+          <div class="serv-img">
+            <img src="{{ url_for('static', filename='img/barba.jpg') }}" alt="Barba">
+          </div>
+          <div class="serv-info">
+            <div class="serv-name">Barba</div>
+            <div class="serv-price">R$ 30</div>
+            <div class="serv-time">30 min</div>
+          </div>
+        </div>
+
+        <div class="serv-card" onclick="selectServ(this,'Corte + Barba','R$ 30','30 min')" data-serv="Corte + Barba" data-price="R$ 30">
+          <div class="serv-img">
+            <img src="{{ url_for('static', filename='img/corte2.jpg') }}" alt="Corte + Barba">
+          </div>
+          <div class="serv-info">
+            <div class="serv-name">Corte + Barba</div>
+            <div class="serv-price">R$ 30</div>
+            <div class="serv-time">30 min</div>
+          </div>
+        </div>
+
+        <div class="serv-card" onclick="selectServ(this,'Hidratação','R$ 30','30 min')" data-serv="Hidratação" data-price="R$ 30">
+          <div class="serv-img">
+            <img src="{{ url_for('static', filename='img/corte1.jpg') }}" alt="Hidratação">
+          </div>
+          <div class="serv-info">
+            <div class="serv-name">Hidratação</div>
+            <div class="serv-price">R$ 30</div>
+            <div class="serv-time">30 min</div>
+          </div>
+        </div>
+
       </div>
     </div>
-
-    <div class="serv-card" onclick="selectServ(this,'Barba','R$ 30','30 min')" data-serv="Barba" data-price="R$ 30">
-      <div class="serv-img">
-        <img src="{{ url_for('static', filename='img/barba.jpg') }}" alt="Barba">
-      </div>
-      <div class="serv-info">
-        <div class="serv-name">Barba</div>
-        <div class="serv-price">R$ 30</div>
-        <div class="serv-time">30 min</div>
-      </div>
-    </div>
-
-    <div class="serv-card" onclick="selectServ(this,'Corte + Barba','R$ 30','30 min')" data-serv="Corte + Barba" data-price="R$ 30">
-      <div class="serv-img">
-        <img src="{{ url_for('static', filename='img/corte2.jpg') }}" alt="Corte + Barba">
-      </div>
-      <div class="serv-info">
-        <div class="serv-name">Corte + Barba</div>
-        <div class="serv-price">R$ 30</div>
-        <div class="serv-time">30 min</div>
-      </div>
-    </div>
-
-    <div class="serv-card" onclick="selectServ(this,'Hidratação','R$ 30','30 min')" data-serv="Hidratação" data-price="R$ 30">
-      <div class="serv-img">
-        <img src="{{ url_for('static', filename='img/corte1.jpg') }}" alt="Hidratação">
-      </div>
-      <div class="serv-info">
-        <div class="serv-name">Hidratação</div>
-        <div class="serv-price">R$ 30</div>
-        <div class="serv-time">30 min</div>
-      </div>
-    </div>
-
-  </div>
-</div>
 
     <div class="divider"><div class="divider-line"></div><div class="divider-text">horário</div><div class="divider-line"></div></div>
 
@@ -371,7 +494,6 @@
       <div class="section-label">Escolha o horário</div>
       <div class="time-grid">
         {% for horario in horarios %}
-          {# Para marcar horários ocupados, passe a lista 'ocupados' do backend #}
           {% if horario in ocupados %}
             <div class="time-btn taken">{{ horario }}</div>
           {% else %}
@@ -400,11 +522,11 @@
         </div>
         <div class="summary-row">
           <span class="summary-label">Valor</span>
-          <span class="summary-price" id="s-price">R$ 35</span>
+          <span class="summary-price" id="s-price">R$ 30</span>
         </div>
       </div>
 
-      <!-- Formulário que envia para o Flask -->
+      <!-- Formulário Flask -->
       <form method="POST" action="/agenda" id="formAgendar">
         <input type="hidden" name="profissional" id="input-prof" value="Carlos"/>
         <input type="hidden" name="servico"      id="input-serv" value="Corte de Cabelo"/>
@@ -413,6 +535,11 @@
           Escolha um horário
         </button>
       </form>
+
+      <!-- BOTÃO VER AGENDAMENTO — fica logo abaixo do formulário -->
+      <button class="btn-ver-agendamento" onclick="abrirPopup()">
+        📋 Ver agendamento
+      </button>
 
       {% if mensagem %}
         <div class="msg {% if 'realizado' in mensagem %}sucesso{% else %}erro{% endif %}">
@@ -423,8 +550,46 @@
 
   </div><!-- /container -->
 
+  <!-- ── POPUP DE AGENDAMENTO ── -->
+  <div id="popup-agendamento" class="popup-overlay" onclick="fecharPopupFora(event)">
+    <div class="popup-box">
+      <button class="popup-fechar" onclick="fecharPopup()">✕</button>
+
+      <div class="popup-icone">📋</div>
+      <div class="popup-titulo">Seu Agendamento</div>
+
+      <div class="popup-linha">
+        <span class="popup-chave">Cliente</span>
+        <span class="popup-valor" id="popup-cliente">{{ nome_cliente if nome_cliente else '—' }}</span>
+      </div>
+      <div class="popup-linha">
+        <span class="popup-chave">Profissional</span>
+        <span class="popup-valor" id="popup-prof">—</span>
+      </div>
+      <div class="popup-linha">
+        <span class="popup-chave">Serviço</span>
+        <span class="popup-valor" id="popup-serv">—</span>
+      </div>
+      <div class="popup-linha">
+        <span class="popup-chave">Horário</span>
+        <span class="popup-valor" id="popup-horario">—</span>
+      </div>
+      <div class="popup-linha">
+        <span class="popup-chave">Valor</span>
+        <span class="popup-valor dourado" id="popup-preco">—</span>
+      </div>
+
+      <div class="popup-rodape">Barbearia Viola · Estilo &amp; Tradição</div>
+    </div>
+  </div>
+
   <script>
-    var estado = { prof: 'Carlos', serv: 'Corte de Cabelo', price: 'R$ 35', horario: null };
+    var estado = {
+      prof: 'Carlos',
+      serv: 'Corte de Cabelo',
+      price: 'R$ 30',
+      horario: null
+    };
 
     function selectProf(el, name) {
       document.querySelectorAll('.prof-card').forEach(function(c) { c.classList.remove('selected'); });
@@ -454,36 +619,32 @@
       btn.disabled = false;
       btn.textContent = 'Agendar — ' + estado.horario;
     }
+
+    function abrirPopup() {
+      // Preenche os dados do popup com o estado atual
+      document.getElementById('popup-prof').textContent    = estado.prof  || '—';
+      document.getElementById('popup-serv').textContent    = estado.serv  || '—';
+      document.getElementById('popup-horario').textContent = estado.horario || '—';
+      document.getElementById('popup-preco').textContent   = estado.price || '—';
+      document.getElementById('popup-agendamento').classList.add('aberto');
+    }
+
+    function fecharPopup() {
+      document.getElementById('popup-agendamento').classList.remove('aberto');
+    }
+
+    // Fecha ao clicar fora da caixa
+    function fecharPopupFora(e) {
+      if (e.target === document.getElementById('popup-agendamento')) {
+        fecharPopup();
+      }
+    }
+
+    // Fecha com ESC
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') fecharPopup();
+    });
   </script>
-  <!-- BOTÃO -->
-<button class="btn-historico" onclick="abrirHistorico()">
-  📋 Meus Agendamentos
-</button>
-
-<!-- MODAL -->
-<div id="modal-historico" class="modal-overlay" style="display:none">
-  <div class="modal-box">
-    <button class="modal-fechar" onclick="fecharHistorico()">✕</button>
-    <h2 class="modal-titulo">Meus Agendamentos</h2>
-
-    <!-- Busca por telefone -->
-    <div id="modal-busca">
-      <p class="modal-sub">Digite seu telefone para consultar</p>
-      <div class="input-group">
-        <input type="tel" id="input-telefone" placeholder="(00) 00000-0000" maxlength="15">
-        <button onclick="buscarAgendamentos()">Buscar</button>
-      </div>
-      <p id="modal-erro" class="modal-erro" style="display:none"></p>
-    </div>
-
-    <!-- Resultados -->
-    <div id="modal-resultado" style="display:none">
-      <div id="cliente-info" class="cliente-info"></div>
-      <div id="lista-agendamentos"></div>
-      <button class="btn-nova-busca" onclick="novaBusca()">← Buscar outro número</button>
-    </div>
-  </div>
-</div>
 
 </body>
 </html>
