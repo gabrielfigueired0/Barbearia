@@ -1,61 +1,211 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Barbearia Viola</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Barbearia Viola — Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    :root {
+      --gold: #C9A84C;
+      --gold-light: #e8c97a;
+      --dark: #1A1A1A;
+      --cream: #FAF8F3;
+      --text: #2C2C2A;
+      --muted: #888780;
+      --border: #e8e4da;
+      --card: #ffffff;
+    }
 
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(201,168,76,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(201,168,76,0.05) 0%, transparent 50%);
+    }
+
+    .pattern {
+      position: absolute;
+      inset: 0;
+      opacity: 0.03;
+      background-image: repeating-linear-gradient(
+        45deg,
+        #C9A84C 0, #C9A84C 1px,
+        transparent 0, transparent 50%
+      );
+      background-size: 20px 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 24px;
+      padding: 3rem 2.5rem;
+      width: 100%;
+      max-width: 400px;
+      margin: 1rem;
+      position: relative;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.4);
+      animation: fadeUp .5s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo-wrap {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .logo-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #a07830);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 1rem;
+      box-shadow: 0 8px 24px rgba(201,168,76,0.3);
+    }
+
+    .brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      color: var(--text);
+      letter-spacing: 0.5px;
+    }
+
+    .brand span { color: var(--gold); }
+
+    .tagline {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 1.5rem 0;
+    }
+
+    .form-label {
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 500;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      color: var(--text);
+      background: var(--cream);
+      outline: none;
+      transition: border-color .2s;
+      letter-spacing: 2px;
+    }
+
+    .form-input:focus { border-color: var(--gold); }
+
+    .form-input::placeholder { letter-spacing: 0; color: #bbb; }
+
+    .btn-login {
+      width: 100%;
+      padding: 15px;
+      margin-top: 1.25rem;
+      background: var(--dark);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: background .2s, transform .1s;
+    }
+
+    .btn-login:hover { background: #333; }
+    .btn-login:active { transform: scale(0.98); }
+
+    .msg {
+      margin-top: 1rem;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .msg.erro { background: #fcebeb; color: #A32D2D; }
+    .msg.sucesso { background: #eaf3de; color: #3B6D11; }
+
+    .hint {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 1.5rem;
+    }
+  </style>
 </head>
-
 <body>
+  <div class="pattern"></div>
 
-<div class="fundo"></div>
+  <div class="card">
+    <div class="logo-wrap">
+      <div class="logo-circle">✂</div>
+      <div class="brand">Barbearia <span>Viola</span></div>
+      <div class="tagline">Estilo &amp; Tradição</div>
+    </div>
 
-<div class="card">
+    <div class="divider"></div>
 
-<div class="topo">
+    <form method="POST" action="/">
+      <label class="form-label" for="telefone">Telefone de acesso</label>
+      <input
+        class="form-input"
+        type="tel"
+        id="telefone"
+        name="telefone"
+        placeholder="(00) 00000-0000"
+        required
+        autocomplete="off"
+      />
+      <button class="btn-login" type="submit">Entrar</button>
+    </form>
 
-<<<<<<< HEAD
-<div class="logo-box">
-    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo da Barbearia Viola">
-</div>
+    {% if mensagem %}
+      <div class="msg {{ tipo }}">{{ mensagem }}</div>
+    {% endif %}
 
-<h1>BARBEARIA VIOLA</h1>
-<p>Sejá bem-vindo </p>
-=======
-<div class="logo">💈</div>
-
-<h1>BARBEARIA VIOLA</h1>
-<p>Agendamento de cortes</p>
->>>>>>> c54583e7e956fe3a1c673efb30d6c5cf6e992d8b
-
-</div>
-
-<div class="conteudo">
-
-<form method="POST">
-
-<label>Seu telefone:</label>
-
-<input type="tel" name="telefone" placeholder="(00) 00000-0000" required>
-
-<button type="submit">Entrar</button>
-
-</form>
-{% if mensagem %}
-<div class="mensagem {{ tipo }}">
-{{ mensagem }}
-</div>
-{% endif %}
-
-</div>
-
-<div class="rodape">
-Sistema da Barbearia Viola
-</div>
-
-</div>
-
+    <p class="hint">Acesso exclusivo para clientes cadastrados</p>
+  </div>
 </body>
 </html>

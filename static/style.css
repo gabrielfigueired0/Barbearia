@@ -37,7 +37,6 @@ text-align:center;
 background:linear-gradient(180deg,#000,#333);
 color:white;
 padding:30px;
-<<<<<<< HEAD
 position: relative;
 }
 
@@ -55,13 +54,6 @@ position: relative;
     width:100%;
     height:100%;
     object-fit:cover;
-=======
-}
-
-.logo{
-font-size:40px;
-margin-bottom:10px;
->>>>>>> c54583e7e956fe3a1c673efb30d6c5cf6e992d8b
 }
 
 .topo h1{
@@ -282,4 +274,168 @@ button:hover{
 
 background:#333;
 
+}
+/* Botão histórico */
+.btn-historico {
+  background: transparent;
+  border: 1.5px solid #c9a84c;
+  color: #c9a84c;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+.btn-historico:hover {
+  background: #c9a84c;
+  color: #fff;
+}
+
+/* Overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Caixa do modal */
+.modal-box {
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px;
+  width: 90%;
+  max-width: 480px;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+}
+.modal-fechar {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #888;
+}
+.modal-titulo {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #222;
+}
+.modal-sub {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+/* Input de busca */
+.input-group {
+  display: flex;
+  gap: 8px;
+}
+.input-group input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+}
+.input-group input:focus {
+  border-color: #c9a84c;
+}
+.input-group button {
+  background: #c9a84c;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Erro */
+.modal-erro {
+  color: #e53e3e;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+/* Info do cliente */
+.cliente-info {
+  background: #fdf8ee;
+  border: 1px solid #e8d9a0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: #444;
+}
+.cliente-info strong {
+  display: block;
+  font-size: 16px;
+  color: #222;
+  margin-bottom: 4px;
+}
+
+/* Cards de agendamento */
+.agend-card {
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+.agend-card .agend-servico {
+  font-weight: 700;
+  font-size: 15px;
+  color: #222;
+  margin-bottom: 6px;
+}
+.agend-card .agend-detalhe {
+  color: #666;
+  margin-bottom: 2px;
+}
+.agend-card .agend-preco {
+  color: #c9a84c;
+  font-weight: 600;
+  margin-top: 6px;
+}
+.agend-card .agend-status {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #e6f4ea;
+  color: #2d7a3a;
+}
+.agend-card.passado {
+  opacity: 0.6;
+}
+
+.btn-nova-busca {
+  background: none;
+  border: none;
+  color: #c9a84c;
+  cursor: pointer;
+  font-size: 13px;
+  margin-top: 8px;
+  padding: 0;
+}
+
+.sem-agendamentos {
+  text-align: center;
+  color: #888;
+  padding: 24px 0;
+  font-size: 14px;
 }

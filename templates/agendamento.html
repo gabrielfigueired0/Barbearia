@@ -1,58 +1,488 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Barbearia Viola — Agendamento</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-<meta charset="UTF-8">
-<title>Agenda - Barbearia Viola</title>
+    :root {
+      --gold: #C9A84C;
+      --dark: #1A1A1A;
+      --cream: #FAF8F3;
+      --text: #2C2C2A;
+      --muted: #888780;
+      --border: #e8e4da;
+      --card: #ffffff;
+    }
 
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      min-height: 100vh;
+    }
 
+    /* ── HERO ── */
+    .hero {
+      background: var(--dark);
+      padding: 2rem 1.5rem 1.75rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.15) 0%, transparent 70%);
+    }
+
+    .hero-inner { position: relative; }
+
+    .logo-circle {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #a07830);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      margin: 0 auto .75rem;
+    }
+
+    .brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+
+    .brand span { color: var(--gold); }
+
+    .tagline {
+      font-size: 10px;
+      color: #888;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .logout-btn {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.25rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #aaa;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .2s;
+    }
+
+    .logout-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+    /* ── LAYOUT ── */
+    .container {
+      max-width: 540px;
+      margin: 0 auto;
+      padding: 1.75rem 1.25rem 3rem;
+    }
+
+    .section-label {
+      font-size: 10px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+
+    .step { margin-bottom: 1.75rem; }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 1.5rem 0;
+    }
+
+    .divider-line { flex: 1; height: 0.5px; background: var(--border); }
+    .divider-text { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+
+    /* ── PROFISSIONAIS ── */
+    .prof-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .prof-card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+    }
+
+    .prof-card:hover { border-color: var(--gold); }
+    .prof-card.selected { border-color: var(--gold); background: #fffbf0; }
+
+    .prof-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      margin: 0 auto 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .prof-name { font-size: 14px; font-weight: 500; }
+    .prof-role { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* ── SERVIÇOS ── */
+    .services-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .serv-card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+    }
+
+    .serv-card:hover { border-color: var(--gold); }
+    .serv-card.selected { border-color: var(--gold); background: #fffbf0; }
+
+   .serv-img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+   }
+
+   .serv-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+   }
+
+    /* Se você tiver imagens reais, substitua o emoji por:
+       <img src="{{ url_for('static', filename='img/corte.jpg') }}" alt="Corte" style="width:100%;height:88px;object-fit:cover;">
+    */
+
+    .serv-info { padding: 10px 12px; }
+    .serv-name { font-size: 13px; font-weight: 500; }
+    .serv-price { font-size: 12px; color: var(--gold); font-weight: 500; margin-top: 2px; }
+    .serv-time { font-size: 11px; color: var(--muted); }
+
+    /* ── HORÁRIOS ── */
+    .time-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .time-btn {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 4px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: border-color .2s, background .2s;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .time-btn:hover { border-color: var(--gold); }
+    .time-btn.selected { background: var(--dark); color: #fff; border-color: var(--dark); }
+
+    .time-btn.taken {
+      background: #f5f2ea;
+      color: #ccc;
+      cursor: not-allowed;
+      text-decoration: line-through;
+      pointer-events: none;
+    }
+
+    /* ── RESUMO ── */
+    .summary-card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 0.5px solid var(--border);
+      font-size: 14px;
+    }
+
+    .summary-row:last-child { border: none; padding-bottom: 0; }
+    .summary-label { color: var(--muted); }
+    .summary-val { font-weight: 500; }
+    .summary-price { color: var(--gold); font-weight: 500; }
+
+    /* ── BOTÃO ── */
+    .btn-agendar {
+      width: 100%;
+      padding: 16px;
+      background: var(--dark);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: background .2s, transform .1s;
+      margin-top: 1rem;
+    }
+
+    .btn-agendar:hover { background: #333; }
+    .btn-agendar:active { transform: scale(0.98); }
+    .btn-agendar:disabled { background: #ccc; cursor: not-allowed; }
+
+    /* ── MENSAGENS ── */
+    .msg {
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 14px;
+      margin-top: 1rem;
+      text-align: center;
+    }
+
+    .msg.sucesso { background: #eaf3de; color: #3B6D11; }
+    .msg.erro    { background: #fcebeb; color: #A32D2D; }
+  </style>
 </head>
-
 <body>
 
-<div class="agenda-container">
+  <div class="hero">
+    <a href="/logout" class="logout-btn">Sair</a>
+    <div class="hero-inner">
+      <div class="logo-circle">✂</div>
+      <div class="brand">Barbearia <span>Viola</span></div>
+      <div class="tagline">Estilo &amp; Tradição</div>
+    </div>
+  </div>
 
-<img src="{{ url_for('static', filename='logo.png') }}" class="logo-agenda">
+  <div class="container">
 
-<<<<<<< HEAD
+    <!-- PROFISSIONAL -->
+    <div class="step">
+      <div class="section-label">Escolha o profissional</div>
+      <div class="prof-grid">
+        <div class="prof-card selected" onclick="selectProf(this,'Carlos')" data-prof="Carlos">
+          <div class="prof-avatar" style="background:linear-gradient(135deg,#C9A84C,#a07830)">C</div>
+          <div class="prof-name">Carlos</div>
+          <div class="prof-role">Barbeiro Sênior</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"><div class="divider-line"></div><div class="divider-text">serviço</div><div class="divider-line"></div></div>
+
+<!-- SERVIÇO -->
+<div class="step">
+  <div class="section-label">Escolha o serviço</div>
+  <div class="services-grid">
+
+    <div class="serv-card selected" onclick="selectServ(this,'Corte de Cabelo','R$ 30','30 min')" data-serv="Corte de Cabelo" data-price="R$ 30">
+      <div class="serv-img">
+        <img src="{{ url_for('static', filename='img/corte3.jpg') }}" alt="Corte de Cabelo">
+      </div>
+      <div class="serv-info">
+        <div class="serv-name">Corte de Cabelo</div>
+        <div class="serv-price">R$ 30</div>
+        <div class="serv-time">30 min</div>
+      </div>
+    </div>
+
+    <div class="serv-card" onclick="selectServ(this,'Barba','R$ 30','30 min')" data-serv="Barba" data-price="R$ 30">
+      <div class="serv-img">
+        <img src="{{ url_for('static', filename='img/barba.jpg') }}" alt="Barba">
+      </div>
+      <div class="serv-info">
+        <div class="serv-name">Barba</div>
+        <div class="serv-price">R$ 30</div>
+        <div class="serv-time">30 min</div>
+      </div>
+    </div>
+
+    <div class="serv-card" onclick="selectServ(this,'Corte + Barba','R$ 30','30 min')" data-serv="Corte + Barba" data-price="R$ 30">
+      <div class="serv-img">
+        <img src="{{ url_for('static', filename='img/corte2.jpg') }}" alt="Corte + Barba">
+      </div>
+      <div class="serv-info">
+        <div class="serv-name">Corte + Barba</div>
+        <div class="serv-price">R$ 30</div>
+        <div class="serv-time">30 min</div>
+      </div>
+    </div>
+
+    <div class="serv-card" onclick="selectServ(this,'Hidratação','R$ 30','30 min')" data-serv="Hidratação" data-price="R$ 30">
+      <div class="serv-img">
+        <img src="{{ url_for('static', filename='img/corte1.jpg') }}" alt="Hidratação">
+      </div>
+      <div class="serv-info">
+        <div class="serv-name">Hidratação</div>
+        <div class="serv-price">R$ 30</div>
+        <div class="serv-time">30 min</div>
+      </div>
+    </div>
+
+  </div>
 </div>
 
-=======
->>>>>>> c54583e7e956fe3a1c673efb30d6c5cf6e992d8b
-<h1>Barbearia Viola</h1>
+    <div class="divider"><div class="divider-line"></div><div class="divider-text">horário</div><div class="divider-line"></div></div>
 
-<h2>Agendar Horário</h2>
+    <!-- HORÁRIOS -->
+    <div class="step">
+      <div class="section-label">Escolha o horário</div>
+      <div class="time-grid">
+        {% for horario in horarios %}
+          {# Para marcar horários ocupados, passe a lista 'ocupados' do backend #}
+          {% if horario in ocupados %}
+            <div class="time-btn taken">{{ horario }}</div>
+          {% else %}
+            <div class="time-btn" onclick="selectTime(this)">{{ horario }}</div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
 
+    <div class="divider"><div class="divider-line"></div><div class="divider-text">resumo</div><div class="divider-line"></div></div>
 
-<form>
+    <!-- RESUMO + FORM -->
+    <div class="step">
+      <div class="summary-card">
+        <div class="summary-row">
+          <span class="summary-label">Profissional</span>
+          <span class="summary-val" id="s-prof">Carlos</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Serviço</span>
+          <span class="summary-val" id="s-serv">Corte de Cabelo</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Horário</span>
+          <span class="summary-val" id="s-time">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Valor</span>
+          <span class="summary-price" id="s-price">R$ 35</span>
+        </div>
+      </div>
 
-<form method="POST">
+      <!-- Formulário que envia para o Flask -->
+      <form method="POST" action="/agenda" id="formAgendar">
+        <input type="hidden" name="profissional" id="input-prof" value="Carlos"/>
+        <input type="hidden" name="servico"      id="input-serv" value="Corte de Cabelo"/>
+        <input type="hidden" name="horario"      id="input-time" value=""/>
+        <button type="submit" class="btn-agendar" id="btnAgendar" disabled>
+          Escolha um horário
+        </button>
+      </form>
 
-<label>Serviço</label>
+      {% if mensagem %}
+        <div class="msg {% if 'realizado' in mensagem %}sucesso{% else %}erro{% endif %}">
+          {{ mensagem }}
+        </div>
+      {% endif %}
+    </div>
 
-<select name="servico">
-<option>Corte de Cabelo</option>
-<option>Barba</option>
-<option>Corte + Barba</option>
-</select>
+  </div><!-- /container -->
 
-<label>Horário</label>
+  <script>
+    var estado = { prof: 'Carlos', serv: 'Corte de Cabelo', price: 'R$ 35', horario: null };
 
-<select name="horario">
+    function selectProf(el, name) {
+      document.querySelectorAll('.prof-card').forEach(function(c) { c.classList.remove('selected'); });
+      el.classList.add('selected');
+      estado.prof = name;
+      document.getElementById('s-prof').textContent = name;
+      document.getElementById('input-prof').value = name;
+    }
 
-{% for h in horarios %}
+    function selectServ(el, serv, price, time) {
+      document.querySelectorAll('.serv-card').forEach(function(c) { c.classList.remove('selected'); });
+      el.classList.add('selected');
+      estado.serv = serv;
+      estado.price = price;
+      document.getElementById('s-serv').textContent = serv;
+      document.getElementById('s-price').textContent = price;
+      document.getElementById('input-serv').value = serv;
+    }
 
-<option>{{ h }}</option>
+    function selectTime(el) {
+      document.querySelectorAll('.time-btn:not(.taken)').forEach(function(b) { b.classList.remove('selected'); });
+      el.classList.add('selected');
+      estado.horario = el.textContent.trim();
+      document.getElementById('s-time').textContent = estado.horario;
+      document.getElementById('input-time').value = estado.horario;
+      var btn = document.getElementById('btnAgendar');
+      btn.disabled = false;
+      btn.textContent = 'Agendar — ' + estado.horario;
+    }
+  </script>
+  <!-- BOTÃO -->
+<button class="btn-historico" onclick="abrirHistorico()">
+  📋 Meus Agendamentos
+</button>
 
-{% endfor %}
+<!-- MODAL -->
+<div id="modal-historico" class="modal-overlay" style="display:none">
+  <div class="modal-box">
+    <button class="modal-fechar" onclick="fecharHistorico()">✕</button>
+    <h2 class="modal-titulo">Meus Agendamentos</h2>
 
-</select>
+    <!-- Busca por telefone -->
+    <div id="modal-busca">
+      <p class="modal-sub">Digite seu telefone para consultar</p>
+      <div class="input-group">
+        <input type="tel" id="input-telefone" placeholder="(00) 00000-0000" maxlength="15">
+        <button onclick="buscarAgendamentos()">Buscar</button>
+      </div>
+      <p id="modal-erro" class="modal-erro" style="display:none"></p>
+    </div>
 
-<button type="submit">Agendar</button>
-
-
-
+    <!-- Resultados -->
+    <div id="modal-resultado" style="display:none">
+      <div id="cliente-info" class="cliente-info"></div>
+      <div id="lista-agendamentos"></div>
+      <button class="btn-nova-busca" onclick="novaBusca()">← Buscar outro número</button>
+    </div>
+  </div>
 </div>
 
 </body>
