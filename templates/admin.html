@@ -146,12 +146,41 @@
     }
     .horario-slot.ocupado { border-color: rgba(201,168,76,0.25); background: rgba(201,168,76,0.04); }
     .horario-slot.livre   { opacity: 0.4; }
+
+    /* ── SLOT CONCLUÍDO ── */
+    .horario-slot.slot-concluido {
+      border-color: rgba(107,191,89,0.3) !important;
+      background: rgba(107,191,89,0.04) !important;
+    }
+    .concluido-badge {
+      display: inline-block;
+      font-size: 10px; color: var(--green);
+      background: rgba(107,191,89,0.1);
+      border: 1px solid rgba(107,191,89,0.25);
+      padding: 2px 8px; border-radius: 20px;
+      margin-bottom: 8px;
+    }
+
     .slot-hora   { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--gold); margin-bottom: 8px; }
     .slot-livre-txt { font-size: 12px; color: var(--muted); font-style: italic; }
     .slot-cliente { font-size: 13px; font-weight: 500; color: #fff; margin-bottom: 2px; }
     .slot-tel     { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
     .slot-serv    { font-size: 12px; color: var(--text); margin-bottom: 2px; }
     .slot-valor   { font-size: 12px; color: var(--gold); font-weight: 500; margin-bottom: 10px; }
+
+    /* ── BTN CONCLUIR ── */
+    .btn-concluir {
+      width: 100%; padding: 7px;
+      background: rgba(107,191,89,0.08);
+      border: 1px solid rgba(107,191,89,0.25);
+      color: var(--green);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px; font-weight: 500;
+      border-radius: 8px; cursor: pointer; transition: all .2s;
+      margin-bottom: 6px;
+    }
+    .btn-concluir:hover { background: rgba(107,191,89,0.2); border-color: var(--green); }
+
     .btn-remover {
       width: 100%; padding: 7px;
       background: rgba(224,82,82,0.08);
@@ -305,12 +334,21 @@
       {% for h in todos_horarios %}
         {% set ag = agendamentos_hoje_map.get(h) %}
         {% if ag %}
-          <div class="horario-slot ocupado">
+          <div class="horario-slot ocupado {% if ag.concluido %}slot-concluido{% endif %}">
             <div class="slot-hora">{{ h }}</div>
+            {% if ag.concluido %}
+              <div class="concluido-badge">✓ Concluído</div>
+            {% endif %}
             <div class="slot-cliente">{{ ag.nome_cliente }}</div>
             <div class="slot-tel">{{ ag.telefone }}</div>
             <div class="slot-serv">{{ ag.servico }} · {{ ag.profissional }}</div>
             <div class="slot-valor">{{ ag.valor }}</div>
+            {% if not ag.concluido %}
+              <form method="POST" action="/admin/concluir" style="margin-bottom:0">
+                <input type="hidden" name="agendamento_id" value="{{ ag.id }}">
+                <button type="submit" class="btn-concluir">✓ Corte realizado</button>
+              </form>
+            {% endif %}
             <button class="btn-remover"
               onclick="abrirModalRemover({{ ag.id }}, '{{ ag.nome_cliente }}', '{{ h }}')">
               ✕ Remover agendamento

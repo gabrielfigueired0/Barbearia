@@ -104,18 +104,13 @@
     {% if erro %}
       <div class="erro">{{ erro }}</div>
     {% endif %}
-
-    <form method="POST" action="/admin/login">
+      <form method="POST" action="/admin/login">
       <div class="campo-wrap">
-        <label class="campo-label" for="usuario">Usuário</label>
-        <input class="campo-input" type="text" id="usuario" name="usuario" placeholder="admin" required>
-      </div>
-      <div class="campo-wrap">
-        <label class="campo-label" for="senha">Senha</label>
-        <input class="campo-input" type="password" id="senha" name="senha" placeholder="••••••••" required>
-      </div>
-      <button type="submit" class="btn">Acessar painel</button>
-    </form>
+        <label class="campo-label" for="telefone">Número do administrador</label>
+          <input class="campo-input" type="tel" id="telefone" name="telefone" placeholder="Seu número de telefone" required>
+    </div>
+        <button type="submit" class="btn">Acessar painel</button>
+      </form>
 
     <div class="voltar"><a href="/login">← Voltar ao início</a></div>
   </div>

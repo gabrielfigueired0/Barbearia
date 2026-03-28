@@ -36,9 +36,17 @@ def init_db():
                 valor_num    REAL    DEFAULT 0,
                 data         TEXT    DEFAULT (date('now','localtime')),
                 criado_em    TEXT    DEFAULT (datetime('now','localtime')),
+                concluido    INTEGER DEFAULT 0,
                 FOREIGN KEY (cliente_id) REFERENCES clientes(id)
             );
         ''')
+        # Adiciona colunas caso o banco já existia sem elas
+        for col, tipo in [('valor_num', 'REAL DEFAULT 0'), ('concluido', 'INTEGER DEFAULT 0')]:
+            try:
+                conn.execute(f"ALTER TABLE agendamentos ADD COLUMN {col} {tipo}")
+                conn.commit()
+            except:
+                pass
 
 init_db()
 
@@ -59,8 +67,7 @@ PRECOS = {
     'Hidratação':      ('R$ 40', 40.0),
 }
 
-ADMIN_USUARIO = 'admin'
-ADMIN_SENHA   = 'viola2024'
+ADMIN_TELEFONE = '7412345678'  # ← seu número real aqui
 
 # ─────────────────────────────────────────
 # HELPERS
@@ -73,7 +80,7 @@ def calcular_lucro(conn, data_ini, data_fim):
     rows = conn.execute(
         '''SELECT COALESCE(SUM(valor_num), 0) AS total, COUNT(*) AS qtd
            FROM agendamentos
-           WHERE data >= ? AND data <= ?''',
+           WHERE data >= ? AND data <= ? AND concluido = 1''',
         (data_ini, data_fim)
     ).fetchone()
     return rows['total'], rows['qtd']
@@ -198,6 +205,26 @@ def agenda():
     )
 
 # ─────────────────────────────────────────
+# MEUS AGENDAMENTOS (CLIENTE)
+# ─────────────────────────────────────────
+
+@app.route('/meus-agendamentos')
+def meus_agendamentos():
+    if 'cliente_id' not in session:
+        return {'erro': 'não autenticado'}, 401
+
+    with get_db() as conn:
+        ags = conn.execute(
+            '''SELECT profissional, servico, horario, valor, data
+               FROM agendamentos
+               WHERE cliente_id = ?
+               ORDER BY data DESC, horario DESC''',
+            (session['cliente_id'],)
+        ).fetchall()
+
+    return {'agendamentos': [dict(a) for a in ags]}
+
+# ─────────────────────────────────────────
 # ADMIN — LOGIN
 # ─────────────────────────────────────────
 
@@ -205,12 +232,11 @@ def agenda():
 def admin_login():
     erro = None
     if request.method == 'POST':
-        u = request.form.get('usuario', '')
-        s = request.form.get('senha', '')
-        if u == ADMIN_USUARIO and s == ADMIN_SENHA:
+        telefone = request.form.get('telefone', '').strip()
+        if telefone == ADMIN_TELEFONE:
             session['admin'] = True
             return redirect(url_for('admin_painel'))
-        erro = 'Usuário ou senha incorretos.'
+        erro = 'Número não autorizado.'
     return render_template('admin_login.html', erro=erro)
 
 @app.route('/admin/logout')
@@ -228,17 +254,15 @@ def admin_painel():
         return redirect(url_for('admin_login'))
 
     hoje  = datetime.now()
-    s_ini = (hoje - timedelta(days=hoje.weekday())).strftime('%Y-%m-%d')   # segunda-feira
-    m_ini = hoje.strftime('%Y-%m-01')                                       # primeiro do mês
+    s_ini = (hoje - timedelta(days=hoje.weekday())).strftime('%Y-%m-%d')
+    m_ini = hoje.strftime('%Y-%m-01')
     hoje_str = hoje.strftime('%Y-%m-%d')
 
     with get_db() as conn:
-        # Lucro
-        val_dia,     qtd_dia     = calcular_lucro(conn, hoje_str, hoje_str)
-        val_semana,  qtd_semana  = calcular_lucro(conn, s_ini,    hoje_str)
-        val_mes,     qtd_mes     = calcular_lucro(conn, m_ini,    hoje_str)
+        val_dia,    qtd_dia    = calcular_lucro(conn, hoje_str, hoje_str)
+        val_semana, qtd_semana = calcular_lucro(conn, s_ini,    hoje_str)
+        val_mes,    qtd_mes    = calcular_lucro(conn, m_ini,    hoje_str)
 
-        # Agendamentos de hoje com dados do cliente
         ags_hoje = conn.execute(
             '''SELECT a.*, c.nome AS nome_cliente, c.telefone
                FROM agendamentos a
@@ -248,27 +272,44 @@ def admin_painel():
             (hoje_str,)
         ).fetchall()
 
-        # Clientes
         clientes = conn.execute(
             'SELECT * FROM clientes ORDER BY criado_em DESC'
         ).fetchall()
 
-    # Mapa horario -> agendamento para o template
     mapa = {row['horario']: row for row in ags_hoje}
 
     return render_template(
         'admin.html',
-        todos_horarios      = HORARIOS,
-        agendamentos_hoje   = ags_hoje,
+        todos_horarios        = HORARIOS,
+        agendamentos_hoje     = ags_hoje,
         agendamentos_hoje_map = mapa,
-        clientes            = clientes,
-        lucro_dia           = formatar_reais(val_dia),
-        lucro_semana        = formatar_reais(val_semana),
-        lucro_mes           = formatar_reais(val_mes),
-        qtd_dia             = qtd_dia,
-        qtd_semana          = qtd_semana,
-        qtd_mes             = qtd_mes,
+        clientes              = clientes,
+        lucro_dia             = formatar_reais(val_dia),
+        lucro_semana          = formatar_reais(val_semana),
+        lucro_mes             = formatar_reais(val_mes),
+        qtd_dia               = qtd_dia,
+        qtd_semana            = qtd_semana,
+        qtd_mes               = qtd_mes,
     )
+
+# ─────────────────────────────────────────
+# ADMIN — CONCLUIR CORTE
+# ─────────────────────────────────────────
+
+@app.route('/admin/concluir', methods=['POST'])
+def admin_concluir():
+    if not session.get('admin'):
+        return redirect(url_for('admin_login'))
+
+    ag_id = request.form.get('agendamento_id')
+    if ag_id:
+        with get_db() as conn:
+            conn.execute(
+                'UPDATE agendamentos SET concluido = 1 WHERE id = ?', (ag_id,)
+            )
+            conn.commit()
+        flash('Corte marcado como concluído! Valor debitado no saldo.', 'ok')
+    return redirect(url_for('admin_painel'))
 
 # ─────────────────────────────────────────
 # ADMIN — REMOVER AGENDAMENTO

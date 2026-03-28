@@ -553,31 +553,20 @@
   <!-- ── POPUP DE AGENDAMENTO ── -->
   <div id="popup-agendamento" class="popup-overlay" onclick="fecharPopupFora(event)">
     <div class="popup-box">
-      <button class="popup-fechar" onclick="fecharPopup()">✕</button>
+  <button class="popup-fechar" onclick="fecharPopup()">✕</button>
 
-      <div class="popup-icone">📋</div>
-      <div class="popup-titulo">Seu Agendamento</div>
+  <div class="popup-icone">📋</div>
+  <div class="popup-titulo">Meus Agendamentos</div>
+  <div style="font-size:13px;color:#888;text-align:center;margin-bottom:1rem;">
+    {{ nome_cliente }}
+  </div>
 
-      <div class="popup-linha">
-        <span class="popup-chave">Cliente</span>
-        <span class="popup-valor" id="popup-cliente">{{ nome_cliente if nome_cliente else '—' }}</span>
-      </div>
-      <div class="popup-linha">
-        <span class="popup-chave">Profissional</span>
-        <span class="popup-valor" id="popup-prof">—</span>
-      </div>
-      <div class="popup-linha">
-        <span class="popup-chave">Serviço</span>
-        <span class="popup-valor" id="popup-serv">—</span>
-      </div>
-      <div class="popup-linha">
-        <span class="popup-chave">Horário</span>
-        <span class="popup-valor" id="popup-horario">—</span>
-      </div>
-      <div class="popup-linha">
-        <span class="popup-chave">Valor</span>
-        <span class="popup-valor dourado" id="popup-preco">—</span>
-      </div>
+  <div id="popup-lista" style="max-height:340px;overflow-y:auto;padding-right:4px;">
+    <p style="text-align:center;color:#888;font-size:14px;">Carregando...</p>
+  </div>
+
+  <div class="popup-rodape">Barbearia Viola · Estilo &amp; Tradição</div>
+</div>
 
       <div class="popup-rodape">Barbearia Viola · Estilo &amp; Tradição</div>
     </div>
@@ -620,14 +609,41 @@
       btn.textContent = 'Agendar — ' + estado.horario;
     }
 
-    function abrirPopup() {
-      // Preenche os dados do popup com o estado atual
-      document.getElementById('popup-prof').textContent    = estado.prof  || '—';
-      document.getElementById('popup-serv').textContent    = estado.serv  || '—';
-      document.getElementById('popup-horario').textContent = estado.horario || '—';
-      document.getElementById('popup-preco').textContent   = estado.price || '—';
+function abrirPopup() {
+  fetch('/meus-agendamentos')
+    .then(function(r) { return r.json(); })
+    .then(function(dados) {
+      var lista = document.getElementById('popup-lista');
+      lista.innerHTML = '';
+
+      if (!dados.agendamentos || dados.agendamentos.length === 0) {
+        lista.innerHTML = '<p style="text-align:center;color:#888;font-size:14px;">Nenhum agendamento encontrado.</p>';
+      } else {
+        var hoje = new Date().toISOString().split('T')[0];
+        dados.agendamentos.forEach(function(ag) {
+          var passado = ag.data < hoje;
+          var card = document.createElement('div');
+          card.style.cssText = 'background:#faf8f3;border:1px solid #e8e4da;border-radius:12px;padding:12px 14px;margin-bottom:10px;';
+          card.innerHTML =
+            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">' +
+              '<span style="font-size:13px;font-weight:600;color:#1A1A1A;">' + ag.servico + '</span>' +
+              '<span style="font-size:11px;padding:3px 8px;border-radius:20px;background:' + (passado ? '#f0f0f0' : '#eaf3de') + ';color:' + (passado ? '#999' : '#3B6D11') + ';">' +
+                (passado ? 'Concluído' : 'Agendado') +
+              '</span>' +
+            '</div>' +
+            '<div style="font-size:12px;color:#888;display:flex;gap:16px;">' +
+              '<span>📅 ' + ag.data.split('-').reverse().join('/') + '</span>' +
+              '<span>🕐 ' + ag.horario + '</span>' +
+              '<span>✂️ ' + ag.profissional + '</span>' +
+            '</div>' +
+            '<div style="font-size:13px;color:#C9A84C;font-weight:600;margin-top:6px;">' + ag.valor + '</div>';
+          lista.appendChild(card);
+        });
+      }
+
       document.getElementById('popup-agendamento').classList.add('aberto');
-    }
+    });
+}
 
     function fecharPopup() {
       document.getElementById('popup-agendamento').classList.remove('aberto');
